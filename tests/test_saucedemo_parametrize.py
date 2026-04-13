@@ -1,47 +1,37 @@
+"""
+Parametrized test suite for Saucedemo.
+
+Demonstrates pytest.mark.parametrize to run the same test logic
+against multiple data sets without duplicating test functions.
+"""
+
 import pytest
-from pages.saucedemo_page import SaucademoPage
+from pages.saucedemo_page import SaucedemoPage
 
 
-# ------------------------------------------------------------------ #
-#  Parametrize — Login con múltiples usuarios
-#
-#  En vez de escribir un test por cada caso, declaras los datos
-#  y pytest genera un test por cada fila automáticamente.
-#
-#  Formato: @pytest.mark.parametrize("param1, param2", [
-#               (valor1a, valor2a),   ← caso 1
-#               (valor1b, valor2b),   ← caso 2
-#           ])
-# ------------------------------------------------------------------ #
-
-@pytest.mark.parametrize("username, password, expected_message", [
-    ("standard_user",   "secret_sauce", "inventory"),           # login exitoso → verifica URL
+@pytest.mark.parametrize("username, password, expected", [
+    ("standard_user",   "secret_sauce", "inventory"),
     ("locked_out_user", "secret_sauce", "Sorry, this user has been locked out"),
     ("invalid_user",    "secret_sauce", "Username and password do not match"),
 ])
-def test_login_multiples_usuarios(page, username, password, expected_message):
-    login = SaucademoPage(page)
+def test_login_multiple_users(page, username, password, expected):
+    """Verify login behavior for valid, locked-out, and invalid users."""
+    login = SaucedemoPage(page)
     login.navigate()
-    login.login_exitoso(username, password)
+    login.login(username, password)
 
-    # Para el usuario válido verificamos la URL, para los inválidos el mensaje de error
     if username == "standard_user":
-        assert expected_message in page.url
+        assert expected in page.url
     else:
-        assert expected_message in login.error_message().inner_text()
+        assert expected in login.error_message().inner_text()
 
-
-# ------------------------------------------------------------------ #
-#  Parametrize — Agregar múltiples productos al carrito
-#
-#  El mismo flujo de add_to_cart pero con productos distintos.
-# ------------------------------------------------------------------ #
 
 @pytest.mark.parametrize("product_id, name, price", [
     ("sauce-labs-backpack",   "Sauce Labs Backpack",   "$29.99"),
     ("sauce-labs-bike-light", "Sauce Labs Bike Light", "$9.99"),
     ("sauce-labs-onesie",     "Sauce Labs Onesie",     "$7.99"),
 ])
-def test_agregar_productos(saucedemo, product_id, name, price):
+def test_add_multiple_products(saucedemo, product_id, name, price):
+    """Verify each product can be added to the cart individually."""
     saucedemo.add_to_cart(product_id=product_id, name=name, expected_price=price)
     assert saucedemo.page.locator("[data-test='shopping-cart-badge']").inner_text() == "1"
