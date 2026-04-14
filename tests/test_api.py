@@ -1,3 +1,4 @@
+import pytest
 import allure
 
 
@@ -33,6 +34,19 @@ class TestGetPosts:
 
         assert response.status_code == 404
 
+    @pytest.mark.parametrize("post_id", [1, 25, 50, 75, 100])
+    @allure.story("Obtener post específico")
+    @allure.title("GET /posts/{post_id} retorna estructura válida")
+    def test_get_post_structure(self, api_session, post_id):
+        response = api_session.get(f"{api_session.base_url}/posts/{post_id}")
+        body = response.json()
+
+        assert response.status_code == 200
+        assert body["id"] == post_id
+        assert isinstance(body["title"], str) and len(body["title"]) > 0
+        assert isinstance(body["body"], str) and len(body["body"]) > 0
+        assert isinstance(body["userId"], int)
+
 
 @allure.feature("API Posts")
 class TestCreatePost:
@@ -53,6 +67,19 @@ class TestCreatePost:
         assert body["title"] == payload["title"]
         assert body["body"] == payload["body"]
         assert "id" in body
+
+    @pytest.mark.parametrize("payload,expected_status", [
+        ({"title": "Solo título", "userId": 1}, 201),
+        ({"body": "Solo body", "userId": 1}, 201),
+        ({}, 201),
+    ])
+    @allure.story("Crear post con distintos payloads")
+    @allure.title("POST /posts maneja distintos payloads correctamente")
+    def test_create_post_variants(self, api_session, payload, expected_status):
+        response = api_session.post(f"{api_session.base_url}/posts", json=payload)
+
+        assert response.status_code == expected_status
+        assert "id" in response.json()
 
 
 @allure.feature("API Posts")
