@@ -1,6 +1,6 @@
 # QA Automation Portfolio
 
-Portafolio de automatización de pruebas que cubre las tres capas principales del testing: **UI end-to-end**, **API REST** y **rendimiento**.
+Portafolio de automatización de pruebas que cubre las cuatro capas principales del testing: **UI end-to-end**, **API REST**, **rendimiento** y **accesibilidad**.
 
 🔗 **[Ver reporte Allure en vivo](https://anthonytrujillomedina-dot.github.io/qa-portfolio/)**
 
@@ -15,6 +15,7 @@ Portafolio de automatización de pruebas que cubre las tres capas principales de
 | UI E2E | Playwright + Pytest |
 | API REST | Pytest + Requests |
 | Performance | K6 |
+| Accesibilidad | axe-playwright-python |
 | Reportes | Allure (GitHub Pages) |
 | CI/CD | GitHub Actions |
 
@@ -31,7 +32,8 @@ qa-portfolio/
 │   ├── test_saucedemo.py         # Tests E2E — login, carrito, checkout
 │   ├── test_saucedemo_parametrize.py  # Tests parametrizados con múltiples usuarios
 │   ├── test_wikipedia.py         # Tests E2E — búsqueda y navegación
-│   └── test_api.py               # Tests de API REST con fixtures y parametrize
+│   ├── test_api.py               # Tests de API REST con fixtures y parametrize
+│   └── test_accessibility.py     # Tests de accesibilidad con axe-core
 ├── k6/
 │   ├── smoke_test.js             # 1 usuario — verifica que el sitio responde
 │   └── load_test.js              # Rampa de 10 usuarios con thresholds
@@ -107,6 +109,19 @@ k6 run k6/smoke_test.js
 # Load test con reporte HTML
 $env:K6_WEB_DASHBOARD="true"; $env:K6_WEB_DASHBOARD_EXPORT="k6/reports/load_report.html"; k6 run k6/load_test.js
 ```
+
+---
+
+## Tests de Accesibilidad — axe-core
+
+Pruebas automatizadas de accesibilidad usando [axe-core](https://www.deque.com/axe/) integrado con Playwright.
+
+**Páginas analizadas:**
+- Login de Saucedemo — sin violaciones críticas
+- Inventario de Saucedemo — bug conocido documentado (`select-name`: dropdown sin etiqueta accesible)
+- Wikipedia — sin violaciones críticas
+
+Los tests filtran solo violaciones de impacto **critical** y **serious**. Los bugs conocidos del sitio bajo prueba se documentan con `pytest.mark.xfail`.
 
 ---
 
